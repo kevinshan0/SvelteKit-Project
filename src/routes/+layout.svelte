@@ -3,6 +3,7 @@
 
     import { onNavigate } from '$app/navigation';
 
+    // page transitions
     onNavigate((navigation) => {
         if (!document.startViewTransition) return;
 
@@ -14,5 +15,7 @@
         });
     });
   </script>
-  
+
+  <h1>HELLO</h1>
+
   <slot />
