@@ -1,10 +1,7 @@
 <script>
-    import { page } from '$app/stores';
-    import { onMount } from 'svelte';
-    import { goto, beforeNavigate, afterNavigate } from '$app/navigation';
+    import { goto, afterNavigate } from '$app/navigation';
     import { state } from '$lib/stores/scroll.js'
 
-    let place = $page.params.place;
     let places = [
         'Hokkaido',
         'Kyoto',
@@ -12,46 +9,20 @@
         'Tokyo'
     ]
 
-    onMount(() => {
-        addEventListener('wheel', update);
-        addEventListener('keydown', update);
-
-        async function update(e) {
-            let targetURLNext = `../${places[$state + 1]}`;
-            let targetURLPrevious = `../${places[$state - 1]}`;
-            let direction;
-
-            // determine direction
-            switch (e.type) {
-                case 'wheel':
-                    if (e.deltaY > 0) direction = 'up';
-                    if (e.deltaY < 0) direction = 'down';
-                case 'keydown':
-                    if (e.keyCode == 40) direction = 'up';
-                    if (e.keyCode == 38) direction = 'down';
-            }
-
-            // change page and update state
-            switch (direction) {
-                case 'down':
-                    goto(targetURLNext);
-                    state.update(n => (n + 1) % place.length);
-                case 'up':
-                    goto(targetURLPrevious);
-                    state.update(n => (places.length + n - 1) % places.length);
-            }
-        }
-    });
-
-    beforeNavigate(() => {
-        removeEventListener('wheel', update);
-        removeEventListener('keydown', update);
-    })
-
     afterNavigate(() => {
-        addEventListener('wheel', update);
-        addEventListener('keydown', update);
+        addEventListener('wheel', updatePage, {once: true});
+        addEventListener('keydown', updatePage, {once: true});
     })
+
+    async function updatePage(e) {
+        if ((e.type == 'wheel' && e.deltaY > 0) || (e.type == 'keydown' && e.keyCode == 40))
+            state.update(n => (n + 1) % places.length);
+
+        if ((e.type == 'wheel' && e.deltaY < 0) || (e.type == 'keydown' && e.keyCode == 38))
+            state.update(n => (places.length + n - 1) % places.length);
+
+        goto(`../${places[$state]}`);
+    }
 </script>
 
-<div>{place}</div>
+<div>{places[$state]}</div>
