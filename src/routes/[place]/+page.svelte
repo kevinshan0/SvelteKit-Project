@@ -1,6 +1,6 @@
 <script>
     import { goto, afterNavigate } from '$app/navigation';
-    import { state } from '$lib/stores/scroll.js'
+    import { state } from '$lib/stores/state.js'
 
     let places = [
         'Hokkaido',
